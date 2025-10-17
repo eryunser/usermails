@@ -1,0 +1,24 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# 文档
+*.md
+
+# 上传文件（运行时生成）
+uploads/*
+!uploads/
+
+# 不需要的文件
+*.log

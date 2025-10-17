@@ -1,0 +1,75 @@
+services:
+  # 后端 API 服务
+  backend:
+    image: registry.cn-beijing.aliyuncs.com/eryun/usermails-backend:latest
+    container_name: usermails-backend
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    # 资源限制配置
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G  # 最大内存限制1GB（可根据实际情况调整：1G、2G、4G等）
+        reservations:
+          cpus: '0.5'
+          memory: 128M  # 预留内存
+    environment:
+      # 应用配置
+      - APP_NAME=${APP_NAME:-用户邮箱系统}
+      # JWT密钥配置（重要：生产环境必须修改！）
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-this-in-production}
+      # 管理员账号配置（仅首次部署时生效）
+      - ADMIN_ACCOUNT=${ADMIN_ACCOUNT:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      # 管理员密码重置（设置此变量将强制重置管理员密码）
+      - RESET_ADMIN_PASSWORD=${RESET_ADMIN_PASSWORD:-}
+    volumes:
+      # 数据库持久化
+      - ${BASE_DIR:-.}/data/datebase/:/app/data/
+      # 邮件文件持久化
+      - ${BASE_DIR:-.}/data/emails:/app/emails
+      # 运行时日志
+      - ${BASE_DIR:-.}/data/logs:/app/runtime/logs
+      # 上传文件（用于头像等）
+      - ${BASE_DIR:-.}/data/uploads:/app/web/uploads
+      - ${BASE_DIR:-.}/api:/app/api
+    networks:
+      usermails-network:
+        aliases:
+          - backend
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:9999/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 前端 Web 服务
+  frontend:
+    image: registry.cn-beijing.aliyuncs.com/eryun/usermails-frontend:latest
+    container_name: usermails-frontend
+    restart: unless-stopped
+    ports:
+      - "8800:80"
+    volumes:
+      # 上传文件持久化
+      - ${BASE_DIR:-.}/data/uploads:/usr/share/nginx/html/uploads
+      - ${BASE_DIR:-.}/web:/usr/share/nginx/html/
+    networks:
+      usermails-network:
+        aliases:
+          - frontend
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  usermails-network:
+    driver: bridge

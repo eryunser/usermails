@@ -1,0 +1,17 @@
+netstat -aon | findstr "9999"
+taskkill /PID 11588 /F
+
+py .\start_frontend.py
+py .\start_server.py
+
+$env:DOCKER_BUILDKIT=1
+
+docker buildx build --progress=plain -f api/Dockerfile -t registry.cn-beijing.aliyuncs.com/eryun/usermails-backend:latest ./api
+docker push registry.cn-beijing.aliyuncs.com/eryun/usermails-backend:latest
+
+docker buildx build --progress=plain -f web/Dockerfile -t registry.cn-beijing.aliyuncs.com/eryun/usermails-frontend:latest ./web
+docker push registry.cn-beijing.aliyuncs.com/eryun/usermails-frontend:latest
+
+docker-compose down
+docker-compose pull
+docker-compose up -d

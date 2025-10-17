@@ -1,0 +1,766 @@
+/* 全局和基本布局 */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f5f7fa;
+    overflow: hidden; /* 防止出现滚动条 */
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 顶部导航栏 */
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 60px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e6e6e6;
+    flex-shrink: 0;
+}
+
+.header-left .logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.header-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar {
+    display: flex;
+    width: 50%;
+    max-width: 400px;
+}
+
+.header-right .layui-nav {
+    background: none;
+}
+
+.header-right .layui-nav .layui-nav-item a {
+    color: #333;
+}
+
+/* 主体区域 */
+.main-container {
+    display: flex;
+    flex-grow: 1;
+    height: calc(100% - 60px);
+    background-color: #fff;
+}
+
+/* 第一栏: 账户和文件夹 */
+.column-one {
+    flex: 2;
+    border-right: 1px solid #e6e6e6;
+    background-color: #f5f7fa; /* 调整背景色 */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.column-one-header {
+    padding: 10px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.header-buttons-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-buttons-spacer {
+    flex-grow: 1;
+}
+
+#add-account-btn,
+#compose-email-btn,
+#toggle-folders-btn {
+    flex-shrink: 0;
+}
+
+.column-one-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.column-one-footer {
+    padding: 15px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.column-one .layui-collapse {
+    border: none;
+    margin-bottom: 15px;
+}
+
+.column-one .layui-colla-item {
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+}
+
+.column-one .layui-colla-title {
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.column-one .layui-colla-content {
+    padding: 10px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.column-one .layui-nav-tree {
+    width: 100%;
+    background: none;
+}
+
+.column-one .layui-nav-tree .layui-nav-item a,
+.column-one .layui-nav-tree .layui-nav-child dd a {
+    color: #333 !important;
+}
+
+/* 账户列表项 */
+.account-list-item {
+    margin-bottom: 5px;
+}
+
+.account-item-main {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+.account-list-item:hover:not(:has(.folder-item-container:hover)) > .account-item-main {
+    background-color: rgba(193, 197, 201, 0.5);
+}
+
+.account-list-item.selected > .account-item-main {
+    background-color: rgba(193, 197, 201, 0.8);
+}
+
+.toggle-icon-wrapper, .refresh-icon-wrapper, .settings-icon-wrapper {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333; /* 设置图标颜色为深灰色 */
+    transition: all 0.3s ease;
+}
+.toggle-icon-wrapper:hover, .refresh-icon-wrapper:hover, .settings-icon-wrapper:hover {
+    background-color: #dcdfe4;
+}
+
+/* 刷新按钮特殊样式 */
+.refresh-icon-wrapper {
+    margin-left: auto; /* 将刷新按钮推到右侧 */
+    margin-right: 4px; /* 与设置按钮保持一定间距 */
+}
+
+.refresh-icon-wrapper.refreshing {
+    pointer-events: none; /* 刷新中时禁止点击 */
+    opacity: 0.6;
+}
+
+.refresh-icon-wrapper:hover {
+    color: #1E9FFF; /* 悬浮时变为蓝色 */
+}
+
+.refresh-icon-wrapper:active {
+    transform: scale(0.95); /* 点击时缩小效果 */
+}
+
+.account-info-wrapper {
+    flex-grow: 1;
+    padding: 0 8px;
+    overflow: hidden;
+    color: #333 !important;
+    /* 重置 a 标签默认样式 */
+    text-decoration: none;
+}
+
+.account-display {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+.account-name, .account-email {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.account-name {
+    font-size: 14px;
+}
+.account-email {
+    font-size: 11px;
+    color: #777;
+}
+
+.account-folder-dl {
+    padding-left: 36px; /* (28px icon width + 8px padding) */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: none; /* 默认折叠 */
+}
+.account-list-item.expanded > .account-folder-dl {
+    display: block; /* 展开时显示 */
+}
+.account-folder-dl dd a {
+    padding: 6px;
+    border-radius: 4px;
+    display: block;
+}
+
+.folder-item-container {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.folder-item-container:hover {
+    background-color: rgba(193, 197, 201, 0.5);
+}
+
+.folder-item.selected > .folder-item-container {
+    background-color: rgba(193, 197, 201, 0.8);
+}
+
+.folder-column {
+    display: flex;
+    align-items: center;
+}
+
+.folder-toggle {
+    width: 24px;
+    height: 38px;
+    justify-content: center;
+}
+
+.folder-toggle .folder-toggle-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: 38px;
+    text-align: center;
+    font-size: 12px !important;
+}
+
+.folder-icon {
+    width: 24px;
+    justify-content: center;
+    font-size: 16px;
+    color: #555;
+    margin-right: 2px;
+}
+
+.folder-link {
+    flex-grow: 1;
+    color: #333;
+    text-decoration: none;
+    padding: 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.folder-actions {
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin: 0 5px;
+}
+
+.folder-item.selected > .folder-item-container .folder-actions,
+.folder-item-container:hover .folder-actions {
+    opacity: 1;
+}
+
+.folder-item-container .layui-icon {
+    padding: 0 3px;
+}
+
+.add-subfolder-icon {
+    font-size: 14px;
+    color: #888;
+}
+.add-subfolder-icon:hover {
+    color: #333;
+}
+
+/* 第二栏: 邮件列表 */
+.column-two {
+    flex: 3;
+    border-right: 1px solid #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* 防止 flex item 被内容撑开 */
+}
+
+.email-list-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e6e6e6;
+    background-color: #f5f7fa;
+    flex-shrink: 0;
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+}
+
+.toolbar-btn:hover {
+    color: #000;
+}
+
+#email-list-wrapper {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* 第三栏: 邮件详情 */
+.column-three {
+    flex: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 邮件列表为空时的占位符样式 */
+.column-two.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    font-size: 16px;
+}
+
+/* 邮件列表项样式 */
+.email-list {
+    padding: 10px;
+}
+
+.email-item {
+    position: relative; /* 添加此行以作为子元素定位的上下文 */
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-bottom: 1px solid #e6e6e6;
+    transition: background-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.email-item .email-item-actions {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    display: none;
+    gap: 5px;
+}
+
+.email-item:hover .email-item-actions {
+    display: flex;
+}
+
+.email-checkbox-wrapper {
+    margin-right: 15px;
+    display: none; /* Initially hidden */
+}
+
+#email-list-container.multi-select-mode .email-checkbox-wrapper {
+    display: block; /* Show in multi-select mode */
+}
+
+.email-content {
+    position: relative; /* 设置为相对定位的容器 */
+    padding-left: 15px; /* 恢复增加的前边距 */
+    flex-grow: 1;
+    cursor: pointer;
+    overflow: hidden; /* Prevent content from expanding the container */
+    white-space: nowrap;
+}
+
+.email-item:hover,
+.email-item.selected {
+    background-color: #f5f7fa;
+}
+
+.email-item.unread .email-sender,
+.email-item.unread .email-subject {
+    font-weight: bold; /* 只加粗发件人和主题 */
+}
+
+.email-item.unread .email-content::before {
+    content: '';
+    position: absolute;
+    top: 5px; /* 向下一点 */
+    left: 0; /* 向后一点 */
+    width: 8px;
+    height: 8px;
+    background-color: #ff6b22; /* 橘红色 */
+    border-radius: 50%;
+}
+
+.email-sender {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.email-sender-email {
+    color: #888;
+    font-size: 10px;
+}
+
+.email-subject {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.email-preview {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 新的邮件详情样式 */
+.email-detail {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.email-info-panel {
+    padding: 20px;
+    border-bottom: 1px solid #e6e6e6;
+    background-color: #f9f9f9;
+    flex-shrink: 0;
+}
+
+.email-info-panel .email-subject {
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    padding-right: 20px;
+}
+
+.email-info-panel .email-subject::after {
+    content: '\e61a'; /* layui-icon-down */
+    font-family: 'layui-icon';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.3s;
+}
+
+.email-info-panel.expanded .email-subject::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.info-content {
+    display: none;
+    margin-top: 15px;
+}
+
+.email-info-panel.expanded .info-content {
+    display: block;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.info-row .info-label {
+    width: 70px;
+    font-weight: bold;
+    text-align: right;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.info-row .info-value {
+    flex-grow: 1;
+}
+
+
+.email-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+/* 附件样式 */
+.email-attachments {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.attachments-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.attachments-title i {
+    font-size: 16px;
+    color: #1E9FFF;
+}
+
+.attachments-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #f8f8f8;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    min-width: 0;
+}
+
+.attachment-item:hover {
+    background: #e8f4ff;
+    box-shadow: 0 2px 8px rgba(30, 159, 255, 0.2);
+}
+
+.attachment-item > i {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+/* 不同文件类型的图标颜色 */
+.attachment-item.file-image > i {
+    color: #FF5722;
+}
+
+.attachment-item.file-document > i {
+    color: #2196F3;
+}
+
+.attachment-item.file-archive > i {
+    color: #FFC107;
+}
+
+.attachment-item.file-other > i {
+    color: #1E9FFF;
+}
+
+.attachment-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-name {
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-size {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* 附件悬浮提示样式 */
+.attachment-item::after {
+    content: attr(data-filename);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 5px;
+    z-index: 1000;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.attachment-item:hover::after {
+    opacity: 1;
+}
+
+.email-body-container {
+    flex-grow: 1;
+    overflow: hidden; /* 隐藏此容器的滚动条 */
+}
+
+.email-body-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 占位符样式 */
+.placeholder {
+    text-align: center;
+    color: #888;
+    padding: 50px;
+    font-size: 16px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 70px 1fr 70px 1fr;
+    gap: 8px 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.info-grid .info-label {
+    font-weight: bold;
+    text-align: right;
+}
+
+/* 移动邮件弹窗内的树形组件样式 */
+.folder-tree-panel {
+    padding: 20px;
+}
+
+.layui-tree-main {
+    vertical-align: auto;
+}
+
+.folder-tree-panel .layui-tree-entry {
+    padding: 0px 10px;
+    border-radius: 4px;
+    height: 32px; /* 固定高度 */
+    line-height: 32px; /* 垂直居中 */
+    cursor: pointer;
+}
+
+.folder-tree-panel .layui-tree-entry:hover {
+    background-color: #f0f2f5; /* 调整悬浮背景色 */
+}
+
+.folder-tree-panel .layui-tree-line .layui-tree-entry:hover .layui-tree-txt {
+    text-decoration: none;
+}
+
+/* 附件上传区域样式 */
+#attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.attachment-upload-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f8f8;
+    border-radius: 4px;
+    border: 1px solid #e6e6e6;
+    transition: all 0.2s;
+}
+
+.attachment-upload-item:hover {
+    background: #f0f0f0;
+}
+
+.attachment-upload-item .attachment-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #1E9FFF;
+}
+
+.attachment-upload-item .attachment-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-upload-item .attachment-name {
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-upload-item .attachment-size {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.attachment-upload-item .attachment-remove {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #ff5722;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.attachment-upload-item .attachment-remove:hover {
+    color: #ff0000;
+}

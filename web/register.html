@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 多用户临时邮箱服务</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div id="register-page" class="auth-container">
+        <div class="auth-form">
+            <h2>用户注册</h2>
+            <form class="layui-form" id="register-form">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="text" name="username" required lay-verify="required" class="layui-input" placeholder=" " title="3-50字符">
+                        <label class="form-label">用户名</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="email" name="email" required lay-verify="required|email" class="layui-input" placeholder=" ">
+                        <label class="form-label">邮箱</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="password" name="password" required lay-verify="required" class="layui-input" placeholder=" " title="8位以上">
+                        <label class="form-label">密码</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="password" name="confirm_password" required lay-verify="required" class="layui-input" placeholder=" ">
+                        <label class="form-label">确认密码</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block auth-buttons">
+                        <button class="layui-btn" lay-submit lay-filter="register">注册</button>
+                        <a href="login.html" class="layui-btn layui-btn-primary">返回登录</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="layui/layui.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        layui.use(['form', 'layer'], function(){
+            var form = layui.form;
+            var layer = layui.layer;
+
+            // 注册逻辑
+            form.on('submit(register)', function(data){
+                if (data.field.password !== data.field.confirm_password) {
+                    layer.msg('两次密码不一致', { icon: 7 });
+                    return false;
+                }
+                AuthModule.handleRegister(data.field);
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

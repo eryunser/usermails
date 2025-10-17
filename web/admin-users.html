@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - UserMails</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+        .user-table-container {
+            padding: 16px;
+        }
+        .layui-card {
+            border-radius: 2px;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+        }
+        .layui-card-header {
+            border-bottom: 1px solid #f6f6f6;
+            padding: 16px 20px;
+        }
+        .layui-card-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        .layui-table-cell {
+            height: auto;
+            line-height: 1.6;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+        .status-active {
+            background: #5FB878;
+            color: white;
+        }
+        .status-inactive {
+            background: #FF5722;
+            color: white;
+        }
+        .status-deleted {
+            background: #999;
+            color: white;
+        }
+        .mfa-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+            background: #1E9FFF;
+            color: white;
+        }
+        .admin-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+            background: #FFB800;
+            color: white;
+        }
+        .layui-btn-container {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-table-container">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <h2>用户管理</h2>
+            </div>
+            <div class="layui-card-body">
+                <!-- 搜索表单 -->
+                <form class="layui-form" lay-filter="searchForm" id="searchForm" style="margin-bottom: 15px;">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width: 80px;">用户名</label>
+                            <div class="layui-input-inline" style="width: 150px;">
+                                <input type="text" name="username" placeholder="用户名" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width: 80px;">邮箱</label>
+                            <div class="layui-input-inline" style="width: 200px;">
+                                <input type="text" name="email" placeholder="邮箱" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width: 80px;">状态</label>
+                            <div class="layui-input-inline" style="width: 120px;">
+                                <select name="is_active">
+                                    <option value="">全部</option>
+                                    <option value="true">正常</option>
+                                    <option value="false">已禁用</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button class="layui-btn" lay-submit lay-filter="searchForm">
+                                <i class="layui-icon layui-icon-search"></i> 搜索
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-primary" id="resetSearch">
+                                <i class="layui-icon layui-icon-refresh"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <table class="layui-hide" id="userTable" lay-filter="userTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作列工具条 -->
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add">
+                <i class="layui-icon layui-icon-add-1"></i> 添加用户
+            </button>
+            <button class="layui-btn layui-btn-sm" lay-event="refresh">
+                <i class="layui-icon layui-icon-refresh"></i> 刷新
+            </button>
+        </div>
+    </script>
+
+    <!-- 头像列 -->
+    <script type="text/html" id="avatarTpl">
+        {{# if (d.avatar) { }}
+            <img src="{{ d.avatar }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+        {{# } else { }}
+            <img src="images/user-avatar.png" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+        {{# } }}
+    </script>
+
+    <!-- 操作列 -->
+    <script type="text/html" id="actionBar">
+        {{# var currentUserId = parseInt(localStorage.getItem('current_user_id') || '0'); }}
+        {{# if (d.id !== currentUserId) { }}
+            <a class="layui-btn layui-btn-sm" lay-event="edit">
+                <i class="layui-icon layui-icon-edit"></i> 编辑
+            </a>
+            {{# if (d.is_mfa_enabled) { }}
+                <a class="layui-btn layui-btn-sm layui-btn-warm" lay-event="cancelMFA">
+                    <i class="layui-icon layui-icon-close"></i> 取消MFA
+                </a>
+            {{# } }}
+            {{# if (d.is_active) { }}
+                <a class="layui-btn layui-btn-sm layui-btn-orange" lay-event="disable" style="background-color: #FF9800;">
+                    <i class="layui-icon layui-icon-pause"></i> 禁用
+                </a>
+            {{# } else { }}
+                <a class="layui-btn layui-btn-sm" lay-event="enable" style="background-color: #1E9FFF;">
+                    <i class="layui-icon layui-icon-play"></i> 启用
+                </a>
+            {{# } }}
+            {{# if (!d.delete_time) { }}
+                <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">
+                    <i class="layui-icon layui-icon-delete"></i> 删除
+                </a>
+            {{# } }}
+        {{# } else { }}
+            <span style="color: #999;">当前用户</span>
+        {{# } }}
+    </script>
+
+    <!-- 状态列 -->
+    <script type="text/html" id="statusTpl">
+        {{# if (d.delete_time) { }}
+            <span class="status-badge status-deleted">已删除</span>
+        {{# } else if (d.is_active) { }}
+            <span class="status-badge status-active">正常</span>
+        {{# } else { }}
+            <span class="status-badge status-inactive">已禁用</span>
+        {{# } }}
+    </script>
+
+    <!-- MFA状态列 -->
+    <script type="text/html" id="mfaTpl">
+        {{# if (d.is_mfa_enabled) { }}
+            <span class="mfa-badge">已启用</span>
+        {{# } else { }}
+            <span>未启用</span>
+        {{# } }}
+    </script>
+
+    <!-- 用户类型列 -->
+    <script type="text/html" id="userTypeTpl">
+        {{# if (d.is_admin) { }}
+            <span class="admin-badge">管理员</span>
+        {{# } else { }}
+            <span>普通用户</span>
+        {{# } }}
+    </script>
+
+    <script src="/layui/layui.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin-users.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# 运行时数据
+runtime/logs/*
+runtime/cache/*
+runtime/files/*
+!runtime/.gitignore
+!runtime/cache/.gitkeep
+!runtime/files/.gitkeep
+!runtime/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# 文档和测试
+*.md
+*.log
+
+# 环境变量示例文件
+.env.example

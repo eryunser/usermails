@@ -1,0 +1,95 @@
+/* 认证页面样式 */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.auth-form {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #e8e8e8;
+}
+
+.auth-form h2 {
+    text-align: center;
+    margin-bottom: 35px;
+    color: #333;
+    font-weight: 500;
+    font-size: 24px;
+}
+
+.auth-form .layui-form-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.auth-form .form-label {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    color: #999;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    background-color: #fff;
+    padding: 0 5px;
+}
+
+.auth-form .layui-input {
+    width: 100%;
+    box-sizing: border-box; /* 确保内边距不会影响总宽度 */
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    padding: 20px 15px 10px 15px;
+    height: 56px;
+    line-height: 1.5;
+    transition: all 0.3s;
+}
+
+.auth-form .layui-input:focus,
+.auth-form .layui-input:not(:placeholder-shown) {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.auth-form .layui-input-block {
+    margin-left: 0;
+    position: relative;
+}
+
+.auth-form .layui-input:focus ~ .form-label,
+.auth-form .layui-input:not(:placeholder-shown) ~ .form-label {
+    top: -8px;
+    left: 10px;
+    font-size: 12px;
+    color: #1890ff;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.auth-form .layui-btn {
+    height: 42px;
+    line-height: 42px;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.auth-form .layui-btn-primary {
+    background-color: #fff;
+    border-color: #d9d9d9;
+    color: #555;
+}
+
+.auth-form .layui-btn-primary:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}

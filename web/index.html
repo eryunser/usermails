@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多用户邮箱客户端</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="logo">用户邮箱系统</div>
+            </div>
+            <div class="header-center">
+                <div class="search-bar">
+                    <input type="text" id="sender-search-input" class="layui-input" placeholder="搜索发件人...">
+                    <input type="text" id="keyword-search-input" class="layui-input" placeholder="搜索标题、简介...">
+                    <button class="layui-btn layui-btn-primary" id="search-btn"><i class="layui-icon layui-icon-search"></i></button>
+                </div>
+            </div>
+            <div class="header-right">
+                <ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">
+                            <img src="images/user-avatar.png" class="layui-nav-img">
+                            <span id="username-display">未登录</span>
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" id="profile-btn">个人资料</a></dd>
+                            <dd><a href="javascript:;" id="mfa-settings-btn">MFA设置</a></dd>
+                            <dd id="admin-menu-item" style="display: none;"><a href="javascript:;" id="admin-users-btn">账号管理</a></dd>
+                            <dd><a href="javascript:;" id="logout-btn">退出登录</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- 主体区域 -->
+        <div class="main-container">
+            <!-- 第一栏: 账户和文件夹 -->
+            <aside class="column-one">
+                <div class="column-one-header">
+                    <div class="header-buttons-row">
+                        <button id="add-account-btn" class="layui-btn layui-btn-primary layui-btn-sm">
+                            <i class="layui-icon layui-icon-add-1"></i> 添加邮箱
+                        </button>
+                        <button id="compose-email-btn" class="layui-btn layui-btn-primary layui-btn-sm">
+                            <i class="layui-icon layui-icon-edit"></i> 写邮件
+                        </button>
+                        <div class="header-buttons-spacer"></div>
+                        <div class="layui-btn-group">
+                            <button id="toggle-folders-btn" class="layui-btn layui-btn-primary layui-btn-xs" title="折叠所有文件夹">
+                                <i class="layui-icon layui-icon-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="column-one-content">
+                    <ul id="account-folder-list">
+                        <!-- 动态加载邮箱账户和文件夹 -->
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 第二栏: 邮件列表 -->
+            <main class="column-two" id="email-list-container">
+                <div class="email-list-toolbar">
+                    <div class="toolbar-left">
+                        <div class="layui-form" style="display: inline-block; vertical-align: middle;">
+                            <input type="checkbox" name="selectAll" id="select-all-emails" lay-skin="primary">
+                        </div>
+                        <button class="toolbar-btn" id="multi-select-btn" title="多选"><i class="layui-icon layui-icon-app"></i></button>
+                        <button class="toolbar-btn" id="delete-selected-emails" title="删除"><i class="layui-icon layui-icon-delete"></i></button>
+                        <button class="toolbar-btn" id="permanent-delete-selected-emails" title="彻底删除"><i class="layui-icon layui-icon-close-fill"></i></button>
+                        <button class="toolbar-btn" id="mark-read-btn" title="标记为已读/全部已读"><i class="layui-icon layui-icon-ok-circle"></i></button>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="toolbar-btn" id="refresh-email-list" title="刷新"><i class="layui-icon layui-icon-refresh-3"></i></button>
+                    </div>
+                </div>
+                <div id="email-list-wrapper">
+                    <div class="placeholder">请选择邮件</div>
+                </div>
+            </main>
+
+            <!-- 第三栏: 邮件详情 -->
+            <section class="column-three" id="email-detail-container">
+                <iframe id="email-content-iframe" name="email-content-iframe" frameborder="0" style="width: 100%; height: 100%; display: none;"></iframe>
+                <div class="placeholder">请选择邮件以查看详情</div>
+            </section>
+        </div>
+    </div>
+
+    <script src="layui/layui.js"></script>
+    <script src="js/Sortable.min.js"></script>
+    <script src="js/wangeditor.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/account.js"></script>
+    <script src="js/email.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+
+    <!-- 写邮件弹窗 -->
+    <div id="compose-email-modal" style="display: none; padding: 20px;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">收件人</label>
+                <div class="layui-input-block">
+                    <input type="text" name="to" id="compose-to" required lay-verify="required" placeholder="请输入收件人" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">抄送</label>
+                <div class="layui-input-block">
+                    <input type="text" name="cc" id="compose-cc" placeholder="请输入抄送" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">主题</label>
+                <div class="layui-input-block">
+                    <input type="text" name="subject" id="compose-subject" required lay-verify="required" placeholder="请输入主题" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">正文</label>
+                <div class="layui-input-block">
+                    <div id="compose-body-editor"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">附件</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-sm" id="upload-attachment-btn">
+                        <i class="layui-icon layui-icon-upload"></i> 选择文件
+                    </button>
+                    <div id="attachment-list" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="margin-top: 10px;">
+                <div class="layui-input-block">
+                    <div id="draft-save-status" style="color: #999; font-size: 12px;"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        var editor; // 全局变量，用于存储 WangEditor 实例
+        layui.use(['element', 'layer', 'form', 'upload'], function(){
+            var element = layui.element;
+            var form = layui.form;
+            var upload = layui.upload;
+            var $ = layui.$;
+            App.init();
+
+            // 写邮件按钮点击事件
+            $('#compose-email-btn').on('click', function() {
+                EmailModule.openComposeModal();
+            });
+
+            // 监听发送邮件表单提交
+            form.on('submit(sendEmail)', function(data){
+                data.field.body = editor.txt.html(); // 获取编辑器内容
+                EmailModule.sendEmail(data.field);
+                layer.closeAll('page'); // 关闭所有页面层
+                return false; // 阻止表单跳转
+            });
+        });
+    </script>
+</body>
+</html>

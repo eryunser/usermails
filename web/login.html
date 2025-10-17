@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 多用户临时邮箱服务</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div id="login-page" class="auth-container">
+        <div class="auth-form">
+            <h2>用户登录</h2>
+            <form class="layui-form" id="login-form">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="text" name="username" required lay-verify="required" class="layui-input" placeholder=" " title="3-50字符">
+                        <label class="form-label">用户名</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="password" name="password" required lay-verify="required" class="layui-input" placeholder=" " title="8位以上">
+                        <label class="form-label">密码</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="text" name="mfa_token" class="layui-input" placeholder=" " maxlength="6" title="6位数字">
+                        <label class="form-label">MFA代码 (选填)</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block auth-buttons">
+                        <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+                        <a href="register.html" class="layui-btn layui-btn-primary">注册</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="layui/layui.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // 页面加载时检查token
+        document.addEventListener('DOMContentLoaded', function() {
+            AuthModule.checkTokenAndRedirect();
+        });
+
+        layui.use(['form', 'layer'], function(){
+            var form = layui.form;
+            var layer = layui.layer;
+
+            // 监听登录提交
+            form.on('submit(login)', function(data){
+                AuthModule.handleLogin(data.field);
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>
