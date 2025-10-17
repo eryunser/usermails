@@ -4,6 +4,9 @@
 # 数据目录
 /data
 
+# Cline 规则文件
+.clinerules/
+
 # Python缓存
 __pycache__/
 *.py[cod]

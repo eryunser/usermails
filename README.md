@@ -83,11 +83,6 @@ python start_server.py
 
 详细的 Docker 部署说明请参考 [Docker 部署文档](./docs/DOCKER_DEPLOY.md)
 
-## 默认管理员账号
-
-- 用户名: `eryuns`
-- 密码: `Hujunhao.110`
-
 ## 项目结构
 
 ```
